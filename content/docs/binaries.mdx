@@ -1,0 +1,54 @@
+---
+title: Compiled binaries
+description: How Parley ships two self-contained Bun binaries with embedded migrations.
+icon: Package
+---
+
+Parley ships two `bun build --compile --bytecode` binaries — `parley` (from `@parley/cli`) and `parley-server` (from `@parley/api`) — built independently. Each is a single self-contained file.
+
+The server binary embeds its Drizzle migrations at build time via [`comptime.ts`](https://comptime.js.org/) and auto-applies pending migrations on every `parley-server run`. See [ADR 0008](https://github.com/jliocsar/parley/blob/main/docs/adr/0008-bytecode-compiled-binaries-with-embedded-migrations.md) for the rationale.
+
+## Build
+
+```shell
+bun run build:bin
+# → packages/cli/dist/parley
+# → packages/api/dist/parley-server
+```
+
+## Install
+
+```shell
+bun run install:bin
+```
+
+`install:bin` is strictly a symlink step — run `build:bin` first, or pass `--build`:
+
+```shell
+bun run install:bin -- --build
+```
+
+### Install target
+
+The install target honors `$XDG_BIN_HOME` and falls back to `~/.local/bin`. It:
+
+- Refuses to overwrite a **non-symlink** at the target (so it won't blow away a `bun install -g`-installed `parley`).
+- Replaces existing symlinks.
+- Warns when the chosen directory isn't on `$PATH`.
+
+## Adding a migration
+
+After the binary already exists, the flow is two commands — no source edits:
+
+```shell
+bun --filter @parley/api db:generate
+bun run build:bin
+```
+
+The new migration is bundled into the next build of `parley-server`, and the next `parley-server run` applies it idempotently against the `__drizzle_migrations` table.
+
+## Why bytecode + embed
+
+- **One-file deploy.** Operators ship `parley-server`; no `bun install`, no migration sync step, no separate schema artifact.
+- **Migrations travel with code.** A binary version pins its migration set. Rolling back the binary rolls back the migrations applied by *that* binary; rolling forward applies any new ones.
+- **Bytecode startup.** `--bytecode` cuts cold-start parsing, which matters for the CLI: `parley mcp` is launched per-Claude-session.

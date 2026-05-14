@@ -1,0 +1,19 @@
+{
+  "title": "Parley",
+  "pages": [
+    "index",
+    "---Getting started---",
+    "installation",
+    "quickstart",
+    "---Reference---",
+    "concepts",
+    "architecture",
+    "mcp-tools",
+    "cli",
+    "configuration",
+    "---Operating a server---",
+    "running-a-server",
+    "service",
+    "binaries"
+  ]
+}

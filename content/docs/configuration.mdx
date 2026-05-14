@@ -1,0 +1,60 @@
+---
+title: Configuration
+description: Environment variables and config files used by `parley-server` and the `parley` CLI.
+icon: Settings
+---
+
+## Server (`parley-server`)
+
+Bun auto-loads `.env`, so any of these can sit in a project-local `.env` or be exported from the shell.
+
+| Var | Default | Notes |
+|---|---|---|
+| `PARLEY_PORT` | `6969` | Listening port. |
+| `PARLEY_BIND` | `127.0.0.1` | Non-loopback ⇒ bearer auth required. Not togglable. |
+| `PARLEY_DB_FILE` | `~/.local/share/parley/parley.db` | SQLite file path. Parent dir is created on boot. |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | unset | Enables OTLP traces when set. |
+
+When run as a [user-level service](/docs/service), these live in `~/.config/parley/server.env` and are re-read on every `service restart`:
+
+```shell
+# ~/.config/parley/server.env
+PARLEY_PORT=7070
+PARLEY_BIND=127.0.0.1
+# PARLEY_DB_FILE=
+# OTEL_EXPORTER_OTLP_ENDPOINT=
+```
+
+## CLI (`parley`)
+
+The user CLI reads `~/.config/parley/servers.toml`:
+
+```toml
+default = "prod"
+
+[servers.prod]
+url   = "wss://parley.example.com"
+token = "parley_tok_…"
+
+[servers.local]
+url = "ws://127.0.0.1:6969"
+```
+
+- `default` — name of the server `parley mcp` connects to when no `--server` flag is given.
+- `[servers.<name>]` — one block per registered server. `token` is required for non-loopback URLs.
+
+You don't have to author this file. `parley-server run` writes a `local` entry on first boot when bound to loopback, and `parley mcp` falls back to `ws://127.0.0.1:6969` even if the file is missing.
+
+## Defaults at a glance
+
+| Concern | Default |
+|---|---|
+| Listen address | `ws://127.0.0.1:6969` |
+| DB file | `~/.local/share/parley/parley.db` |
+| Client config | `~/.config/parley/servers.toml` |
+| Service env file | `~/.config/parley/server.env` |
+| Compiled binary location | `$XDG_BIN_HOME` (fallback `~/.local/bin`) |
+| Auth requirement | Off on loopback, on otherwise (non-togglable) |
+| Body cap | 8 KiB |
+| Rate limit | ~10 msgs/sec per Session, burst 20 |
+| Reconnect buffer | ~64 unacked messages per Session |

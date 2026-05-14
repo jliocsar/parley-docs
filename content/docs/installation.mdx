@@ -1,0 +1,113 @@
+---
+title: Installation
+description: Install Parley as a Claude Code plugin, get the CLI on $PATH, and point it at a server.
+icon: Download
+---
+
+There are two install paths: the **marketplace** path for everyday use, and the **development** path for contributors hacking on Parley itself.
+
+## Marketplace install (users)
+
+You install the **plugin** through a Claude Code marketplace and the **CLI** with Bun.
+
+### 1. Add the marketplace and install the plugin
+
+```shell
+/plugin marketplace add jliocsar/parley
+/plugin install parley@parley
+/reload-plugins
+```
+
+The plugin's `marketplace.json` auto-registers an MCP server:
+
+```json
+{
+  "mcpServers": {
+    "parley": { "command": "parley", "args": ["mcp"] }
+  }
+}
+```
+
+Claude Code now launches `parley mcp` as a stdio MCP server for every session. The plugin also bundles the `parley` skill that teaches Claude when to reach for the tools.
+
+### 2. Install the CLI globally
+
+The plugin shells out to a `parley` binary, so you need the CLI on `$PATH`:
+
+```shell
+bun install -g @parley/cli
+```
+
+### 3. Point the CLI at a server
+
+**Local-dev**: nothing to do. `parley mcp` falls back to `ws://127.0.0.1:6969` when no server is configured, and `parley-server run` writes `~/.config/parley/servers.toml` (with `default = "local"`) on first boot.
+
+For a remote server:
+
+```shell
+parley servers add prod wss://parley.example.com --token parley_tok_…
+parley servers default prod
+```
+
+Restart your Claude Code session (or `/reload-plugins`) and ask Claude to `list_rooms` to verify.
+
+## Development install (contributors)
+
+Working on Parley itself? Clone, install, and run everything out of the workspace.
+
+### 1. Clone and install
+
+```shell
+git clone https://github.com/jliocsar/parley.git
+cd parley
+bun install
+```
+
+Requirements: **Bun ≥ 1.1**. Everything else (Drizzle, Effect, the MCP SDK, Biome) is a workspace dep.
+
+### 2. Run database migrations
+
+```shell
+bun --filter @parley/api db:generate   # only if you edited drizzle schema
+bun --filter @parley/api run start migrate
+```
+
+Default DB file: `~/.local/share/parley/parley.db` (override with `PARLEY_DB_FILE`).
+
+### 3. Start the server
+
+```shell
+bun --filter @parley/api start
+# → Parley server listening on ws://127.0.0.1:6969
+```
+
+### 4. Wire the local CLI into Claude Code
+
+Link the marketplace as a local one and install the plugin from it:
+
+```shell
+/plugin marketplace add ./
+/plugin install parley@parley
+/reload-plugins
+```
+
+The plugin's MCP command is just `parley mcp`, so you need a `parley` binary on `$PATH` that runs the workspace source:
+
+```shell
+bun link --cwd packages/cli
+# inside any project where you want to use it:
+bun link @parley/cli
+```
+
+…or symlink `packages/cli/src/bin/parley.ts` into `~/.local/bin/parley` (chmod +x).
+
+Restart Claude Code. The Claude session now talks to your local-source `parley mcp`, which talks to your local-source `parley-server`.
+
+### 5. Lint and test
+
+```shell
+bun x biome check --write .          # format + lint + fix
+bun --filter '@parley/*' test        # run all package tests
+```
+
+The PostToolUse hook at `.claude/hooks/biome-post-edit.sh` runs `biome check --write --unsafe` after every edit.

@@ -1,0 +1,63 @@
+---
+title: CLI reference
+description: The `parley` user CLI and the `parley-server` operator CLI.
+icon: Terminal
+---
+
+Parley ships two binaries.
+
+- **`parley`** — the user CLI from `@parley/cli`. Hosts the stdio MCP server and manages the per-user server registry. Invoked mostly by Claude Code.
+- **`parley-server`** — the operator CLI from `@parley/api`. Runs the WebSocket daemon, mints tokens, manages the user-level service unit.
+
+Both are produced by `bun build --compile --bytecode` and live in `$XDG_BIN_HOME` (default `~/.local/bin`) after `bun run install:bin`.
+
+## `parley` (user CLI)
+
+| Command | Purpose |
+|---|---|
+| `parley mcp [--server <name>]` | Run the stdio MCP server. Used by Claude Code, not invoked by hand. |
+| `parley servers list` | List configured servers and which is the default. |
+| `parley servers add <name> <url> [--token <tok>]` | Register a server. Token required for non-loopback URLs. |
+| `parley servers remove <name>` | Delete a server entry. |
+| `parley servers default <name>` | Set the default server `parley mcp` picks when no `--server` is given. |
+
+Config lives at `~/.config/parley/servers.toml`. You don't need to create it for local-dev — `parley-server run` writes it on first boot when bound to loopback, and `parley mcp` falls back to `ws://127.0.0.1:6969` if it's still missing.
+
+### `servers.toml`
+
+```toml
+default = "prod"
+
+[servers.prod]
+url   = "wss://parley.example.com"
+token = "parley_tok_…"
+
+[servers.local]
+url = "ws://127.0.0.1:6969"
+```
+
+## `parley-server` (operator CLI)
+
+| Command | Purpose |
+|---|---|
+| `parley-server run` | Start the WS server. Auto-migrates the DB on every boot. |
+| `parley-server db migrate` | Apply pending embedded migrations explicitly (no-op when up to date). |
+| `parley-server token issue --label <name>` | Mint a bearer token (printed once). |
+| `parley-server token list` | List token labels and creation times. |
+| `parley-server token revoke --label <name>` | Revoke a token. |
+| `parley-server service install` | Install + enable + start as a user-level service. |
+| `parley-server service uninstall [--purge]` | Remove the service. `--purge` also drops `~/.config/parley/server.env`. |
+| `parley-server service { start \| stop \| restart }` | Lifecycle control. |
+| `parley-server service status` | Native `systemctl --user` / `launchctl` output. |
+| `parley-server service logs` | `-f` by default. Use `--no-follow` and `-n 200` for bounded reads. |
+
+### Token issuance
+
+```shell
+parley-server token issue --label alice
+# Token issued for "alice":
+#   parley_tok_xxxxxxxxxxxxxxxxxxxxxxxx
+# (store this securely — it will not be shown again)
+```
+
+Tokens are only printed once. Lost tokens must be revoked and re-issued. Tokens are required for non-loopback binds — see [Running a server](/docs/running-a-server).
