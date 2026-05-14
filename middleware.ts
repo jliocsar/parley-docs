@@ -11,7 +11,11 @@ const { rewrite: rewriteSuffix } = rewritePath(
   `${docsContentRoute}{/*path}/content.md`,
 );
 
-export default function proxy(request: NextRequest) {
+export const config = {
+  runtime: 'experimental-edge',
+};
+
+export default function middleware(request: NextRequest) {
   const result = rewriteSuffix(request.nextUrl.pathname);
   if (result) {
     return NextResponse.rewrite(new URL(result, request.nextUrl));
