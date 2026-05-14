@@ -1,7 +1,7 @@
 export const appName = 'parley';
 export const docsRoute = '/docs';
-export const docsImageRoute = '/og/docs';
 export const docsContentRoute = '/llms.mdx/docs';
+export const defaultOgImage = '/og-default.png';
 
 export const gitConfig = {
   user: 'jliocsar',
