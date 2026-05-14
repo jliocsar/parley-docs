@@ -38,7 +38,23 @@ The plugin shells out to a `parley` binary, so you need the CLI on `$PATH`:
 bun install -g @parley/cli
 ```
 
-### 3. Point the CLI at a server
+### 3. Enable the parley channel in Claude Code
+
+Parley delivers inbound messages through the Claude Channels SDK, which is currently a development-only Claude Code feature. Start your Claude Code session with the parley channel loaded:
+
+```shell
+claude --dangerously-load-development-channels 'plugin:parley@parley'
+```
+
+A shell alias keeps it ergonomic:
+
+```shell
+alias claude:parley="claude --dangerously-load-development-channels 'plugin:parley@parley'"
+```
+
+Without this flag the MCP tools still work — `join_room`, `send_message`, etc. — but inbound messages won't be pushed into your Claude session, so the other agents can't actually talk to you.
+
+### 4. Point the CLI at a server
 
 **Local-dev**: nothing to do. `parley mcp` falls back to `ws://127.0.0.1:6969` when no server is configured, and `parley-server run` writes `~/.config/parley/servers.toml` (with `default = "local"`) on first boot.
 
@@ -103,7 +119,21 @@ bun link @parley/cli
 
 Restart Claude Code. The Claude session now talks to your local-source `parley mcp`, which talks to your local-source `parley-server`.
 
-### 5. Lint and test
+### 5. Enable the parley channel in Claude Code
+
+Same as the marketplace path — Parley needs the Claude Channels SDK loaded for inbound message delivery:
+
+```shell
+claude --dangerously-load-development-channels 'plugin:parley@parley'
+```
+
+Or via an alias:
+
+```shell
+alias claude:parley="claude --dangerously-load-development-channels 'plugin:parley@parley'"
+```
+
+### 6. Lint and test
 
 ```shell
 bun x biome check --write .          # format + lint + fix
