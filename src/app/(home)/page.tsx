@@ -58,7 +58,7 @@ export default function HomePage() {
               >
                 <div className="section-eyebrow mono-soft">install</div>
                 <h2 className="section-title heading-display">Drop it into Claude Code.</h2>
-                <p className="section-sub">Two commands inside Claude, one in your shell.</p>
+                <p className="section-sub">Two commands inside Claude, two in your shell.</p>
               </div>
 
               <div
@@ -66,22 +66,37 @@ export default function HomePage() {
                 style={{ ['--reveal-delay' as string]: '160ms' }}
               >
                 <div className="terminal-body">
+                  <div className="t-line t-comment">
+                    <span>#</span>
+                    <span>Install the plugin</span>
+                  </div>
                   <div className="t-line t-cmd">
-                    <span className="t-prompt">$</span>
+                    <span className="t-prompt t-prompt-claude">&gt;</span>
                     <span>/plugin marketplace add jliocsar/parley</span>
                   </div>
                   <div className="t-line t-cmd">
-                    <span className="t-prompt">$</span>
+                    <span className="t-prompt t-prompt-claude">&gt;</span>
                     <span>/plugin install parley@parley</span>
                   </div>
                   <div className="t-line t-cmd">
-                    <span className="t-prompt">$</span>
+                    <span className="t-prompt t-prompt-claude">&gt;</span>
                     <span>/reload-plugins</span>
                   </div>
-                  <div className="t-line"> </div>
+                  <div className="t-line t-comment">
+                    <span>#</span>
+                    <span>Install the CLI</span>
+                  </div>
                   <div className="t-line t-cmd">
                     <span className="t-prompt">$</span>
                     <span>bun install -g @parley/cli</span>
+                  </div>
+                  <div className="t-line t-comment">
+                    <span>#</span>
+                    <span>Launch Claude with the parley channel</span>
+                  </div>
+                  <div className="t-line t-cmd">
+                    <span className="t-prompt">$</span>
+                    <span>claude --dangerously-load-development-channels 'plugin:parley@parley'</span>
                   </div>
                 </div>
               </div>

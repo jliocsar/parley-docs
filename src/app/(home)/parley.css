@@ -751,6 +751,12 @@
 .parley-root .terminal.is-visible .t-line:nth-child(6) {
   animation-delay: 470ms;
 }
+.parley-root .terminal.is-visible .t-line:nth-child(7) {
+  animation-delay: 530ms;
+}
+.parley-root .terminal.is-visible .t-line:nth-child(8) {
+  animation-delay: 590ms;
+}
 
 .parley-root .terminal-body {
   margin: 0;
@@ -774,6 +780,18 @@
 }
 .parley-root .t-prompt {
   color: var(--accent);
+}
+.parley-root .t-prompt-claude {
+  color: var(--code-fg);
+}
+.parley-root .t-comment {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: var(--space-2);
+  color: var(--muted);
+}
+.parley-root .t-cmd + .t-comment {
+  margin-top: var(--space-3);
 }
 @keyframes parley-terminal-line-in {
   from {
