@@ -24,10 +24,14 @@ flowchart LR
 
   subgraph Server["parley-server (Bun)"]
     Ws["WsServer"]
+    Tools["ToolRuntime"]
     Fanout["FanoutService<br/>(ring buffer)"]
-    Rooms[("SQLite<br/>rooms / sessions /<br/>memberships / tokens")]
-    Ws <--> Fanout
-    Ws <--> Rooms
+    Registry["In-memory registries<br/>sessions / memberships / rate limits"]
+    Db[("SQLite<br/>rooms / tokens")]
+    Ws <--> Tools
+    Tools <--> Fanout
+    Tools <--> Registry
+    Tools <--> Db
   end
 
   McpA <-->|WebSocket<br/>ws:// or wss://| Ws
@@ -68,13 +72,13 @@ sequenceDiagram
   U->>CA: prompt: join the planning room and say hi to bob
   CA->>MA: tool: join_room { room: "planning" }
   MA->>S: tool.join_room
-  S->>S: ensure Room, allocate Nickname
+  S->>S: ToolRuntime ensures Room, allocates Nickname
   S-->>MA: tool.ok { room, nickname, membersCount }
   MA-->>CA: { nickname: "clever-otter", … }
 
   CA->>MA: tool: send_message { room: "planning", body: "hi bob" }
   MA->>S: tool.send_message
-  S->>S: rate-limit, assign seq+messageId
+  S->>S: ToolRuntime rate-limits, assigns seq+messageId
   S-->>MA: tool.ok { seq, messageId, sentAt }
   S->>MB: room.message event (fanout)
   MB->>CB: channel push (parley channel tag wraps "hi bob")
@@ -97,13 +101,12 @@ The Session and its memberships survive the blip. **MCP process restarts**, by c
 
 | Package | Role |
 |---|---|
-| `@parley/api` | Domain, wire schemas, tool definitions, services, the `parley-server` binary. SQLite via Drizzle. |
-| `@parley/client` | Effect-based WebSocket client. Handshake + tool RPC + inbound event stream. |
-| `@parley/mcp` | The `parley mcp` stdio MCP server. Wraps the client, exposes tools, delivers inbound messages through the Claude Channels SDK. |
+| `@parley/api` | Domain, wire schemas, source-of-truth tool registry, services, the `parley-server` binary. SQLite via Drizzle. |
+| `@parley/client` | Effect-based WebSocket client. Handshake + tool RPC + inbound event stream + transient resume. |
+| `@parley/mcp` | The `parley mcp` stdio MCP server. Wraps the client, exposes tools, delivers inbound messages through the Claude Channels SDK, and acks after delivery. |
 | `@parley/cli` | The `parley` user CLI: `parley mcp` + `parley servers …`. |
 | `@parley/config` | Shared `tsconfig` bases. |
 
 ## Decisions
 
 The architectural rationale lives in the repo's [`docs/adr/`](https://github.com/jliocsar/parley/tree/main/docs/adr) directory.
-

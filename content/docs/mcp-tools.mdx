@@ -28,7 +28,7 @@ Joins (or implicitly creates) a Room. `nickname` is optional — the server allo
 { "room": "planning", "nickname": "alice", "membersCount": 3 }
 ```
 
-Nicknames are unique **per Room**. On collision the server appends `-N`.
+Nicknames are unique **per Room**. If the server is auto-allocating a Nickname and hits a collision, it retries with a `-N` suffix; explicit nickname collisions return an error.
 
 ### `leave_room`
 
@@ -44,8 +44,8 @@ Returns Rooms the calling Session is in and Rooms it could join.
 
 ```jsonc
 {
-  "joined":    [{ "room": "planning", "nickname": "alice" }],
-  "available": [{ "room": "random", "membersCount": 2 }]
+  "joined":    [{ "name": "planning", "nickname": "alice", "membersCount": 3 }],
+  "available": [{ "name": "random", "membersCount": 2 }]
 }
 ```
 

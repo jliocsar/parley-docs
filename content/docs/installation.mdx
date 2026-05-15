@@ -85,7 +85,7 @@ Requirements: **Bun ≥ 1.1**. Everything else (Drizzle, Effect, the MCP SDK, Bi
 
 ```shell
 bun --filter @parley/api db:generate   # only if you edited drizzle schema
-bun --filter @parley/api run start migrate
+bun --filter @parley/api run ./src/bin/parley-server.ts db migrate
 ```
 
 Default DB file: `~/.local/share/parley/parley.db` (override with `PARLEY_DB_FILE`).

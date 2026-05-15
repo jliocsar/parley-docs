@@ -53,6 +53,6 @@ Linux distros without `systemctl --user` (Alpine, WSL pre-systemd) error out wit
 | Platform | Unit / plist | Logs |
 |---|---|---|
 | Linux | `~/.config/systemd/user/parley-server.service` | `journalctl --user -u parley-server` |
-| macOS | `~/Library/LaunchAgents/com.parley.server.plist` | `~/Library/Logs/parley-server.{out,err}.log` |
+| macOS | `~/Library/LaunchAgents/io.parley.server.plist` | `~/Library/Logs/parley/server.{out,err}.log` |
 
 The `service logs` subcommand shells out to the platform-appropriate viewer so you don't have to remember either.
