@@ -6,7 +6,7 @@ icon: Package
 
 Parley ships two `bun build --compile --bytecode` binaries — `parley` (from `@parley/cli`) and `parley-server` (from `@parley/api`) — built independently. Each is a single self-contained file.
 
-The server binary embeds its Drizzle migrations at build time via [`comptime.ts`](https://comptime.js.org/) and auto-applies pending migrations on every `parley-server run`. See [ADR 0008](https://github.com/jliocsar/parley/blob/main/docs/adr/0008-bytecode-compiled-binaries-with-embedded-migrations.md) for the rationale.
+The server binary embeds its Drizzle migrations at build time via [`comptime.ts`](https://comptime.js.org/) and auto-applies pending migrations on every `parley-server run`. The runner delegates to Drizzle's own `dialect.migrate(...)` with a comptime-prebuilt `MigrationMeta` array, so the standard `__drizzle_migrations` bookkeeping (`id / hash / created_at`) stays compatible with anything you'd run via `drizzle-kit` directly. See [ADR 0008](https://github.com/jliocsar/parley/blob/main/docs/adr/0008-bytecode-compiled-binaries-with-embedded-migrations.md) for the rationale.
 
 ## Build
 
