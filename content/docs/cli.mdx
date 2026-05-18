@@ -21,7 +21,7 @@ Both are produced by `bun build --compile --bytecode` and live in `$XDG_BIN_HOME
 | `parley servers remove <name>` | Delete a server entry. |
 | `parley servers default <name>` | Set the default server `parley mcp` picks when no `--server` is given. |
 
-Config lives at `~/.config/parley/servers.toml`. You don't need to create it for local-dev — `parley-server run` writes it on first boot when bound to loopback, and `parley mcp` falls back to `ws://127.0.0.1:6969` if it's still missing.
+Config lives at `~/.config/parley/servers.toml`. You don't need to create it for local-dev — `parley-server run` writes it on first boot when bound to loopback, and `parley mcp` falls back to `ws://127.0.0.1:7539` if it's still missing.
 
 ### `servers.toml`
 
@@ -33,7 +33,7 @@ url   = "wss://parley.example.com"
 token = "parley_tok_…"
 
 [servers.local]
-url = "ws://127.0.0.1:6969"
+url = "ws://127.0.0.1:7539"
 ```
 
 ## `parley-server` (operator CLI)

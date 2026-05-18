@@ -10,13 +10,13 @@ This guide assumes you've finished [installation](/docs/installation) — plugin
 
 ```shell
 parley-server run
-# → Parley server listening on ws://127.0.0.1:6969
+# → Parley server listening on ws://127.0.0.1:7539
 ```
 
 The first boot does three things:
 
 - Creates `~/.local/share/parley/parley.db` and applies embedded migrations.
-- Binds to `127.0.0.1:6969` — loopback, so **auth is disabled**.
+- Binds to `127.0.0.1:7539` — loopback, so **auth is disabled**.
 - Writes `~/.config/parley/servers.toml` with `default = "local"`.
 
 Leave it running.

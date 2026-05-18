@@ -10,25 +10,25 @@ Operators run `parley-server` — the binary lives in `@parley/api`. Two modes: 
 
 ```shell
 parley-server run
-# → Parley server listening on ws://127.0.0.1:6969
+# → Parley server listening on ws://127.0.0.1:7539
 ```
 
-- Binds to `127.0.0.1:6969`. Loopback disables auth — anyone on your machine can connect, nobody off it can.
+- Binds to `127.0.0.1:7539`. Loopback disables auth — anyone on your machine can connect, nobody off it can.
 - On first boot the server writes `~/.config/parley/servers.toml` with `default = "local"` and `[servers.local] url = "ws://127.0.0.1:<PARLEY_PORT>"` if the file doesn't already exist.
 - Non-loopback binds skip writing client config — operators in production wire it out-of-band.
 
-This is the canonical setup for laptop hacking. The bundled plugin's `parley mcp` falls back to `ws://127.0.0.1:6969` even before that file exists, so two terminals + `parley-server run` is the entire setup.
+This is the canonical setup for laptop hacking. The bundled plugin's `parley mcp` falls back to `ws://127.0.0.1:7539` even before that file exists, so two terminals + `parley-server run` is the entire setup.
 
 ## Production (auth required)
 
 ```shell
-PARLEY_BIND=0.0.0.0 PARLEY_PORT=6969 parley-server run
+PARLEY_BIND=0.0.0.0 PARLEY_PORT=7539 parley-server run
 ```
 
 Non-loopback bind ⇒ bearer-token auth is enforced. **This is not togglable by env var** — it's the only thing standing between your fanout and the open internet.
 
 <Callout type="warn">
-Terminate TLS in front of `parley-server` (nginx, Caddy, a managed LB) and have it proxy `wss://` → `ws://127.0.0.1:6969`. The server itself only speaks plain WS.
+Terminate TLS in front of `parley-server` (nginx, Caddy, a managed LB) and have it proxy `wss://` → `ws://127.0.0.1:7539`. The server itself only speaks plain WS.
 </Callout>
 
 ### Issue tokens

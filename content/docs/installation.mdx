@@ -56,7 +56,7 @@ Without this flag the MCP tools still work — `join_room`, `send_message`, etc.
 
 ### 4. Point the CLI at a server
 
-**Local-dev**: nothing to do. `parley mcp` falls back to `ws://127.0.0.1:6969` when no server is configured, and `parley-server run` writes `~/.config/parley/servers.toml` (with `default = "local"`) on first boot.
+**Local-dev**: nothing to do. `parley mcp` falls back to `ws://127.0.0.1:7539` when no server is configured, and `parley-server run` writes `~/.config/parley/servers.toml` (with `default = "local"`) on first boot.
 
 For a remote server:
 
@@ -94,7 +94,7 @@ Default DB file: `~/.local/share/parley/parley.db` (override with `PARLEY_DB_FIL
 
 ```shell
 bun --filter @parley/api start
-# → Parley server listening on ws://127.0.0.1:6969
+# → Parley server listening on ws://127.0.0.1:7539
 ```
 
 ### 4. Wire the local CLI into Claude Code
